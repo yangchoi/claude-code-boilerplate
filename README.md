@@ -47,22 +47,44 @@ CLAUDE.md             # Root/shared guidelines
 
 프로젝트별 컨텍스트 파일. Claude가 자동으로 읽음.
 
+**템플릿 태그:**
+- `[business info]` - 회사/프로젝트별 정보 (DB 호스트, 프로젝트 목록 등)
+- `[custom]` - 팀별 커스텀 규칙
+
 ```markdown
 # Project Name
 
 간단한 설명.
 
+## 코딩 원칙
+Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven
+
+## 필수 규칙
+커밋 금지 파일, Assignee 등
+
+## Database 환경 [business info]
+Production/Staging 호스트
+
+## 프로젝트별 정보 [business info]
+프로젝트 테이블
+
 ## Commands
 빌드/테스트 명령어
 
-## Architecture
-핵심 구조
-
-## Gotchas
-주의사항
+## 도메인별 Skills [custom]
+팀별 스킬 목록
 ```
 
-### 2. Subagents
+### 2. 코딩 원칙
+
+CLAUDE.md에 포함된 핵심 원칙:
+
+1. **Think Before Coding** - 가정 명시, 불확실하면 질문
+2. **Simplicity First** - 요청한 것만 구현, 추측성 기능 금지
+3. **Surgical Changes** - 관련 코드만 수정, 인접 코드 "개선" 금지
+4. **Goal-Driven Execution** - 작업을 검증 가능한 목표로 변환
+
+### 3. Subagents
 
 코드 리뷰, 테스트 작성 등을 위임:
 
@@ -71,7 +93,7 @@ CLAUDE.md             # Root/shared guidelines
 "use subagent test-writer to write tests for this function"
 ```
 
-### 3. Hooks
+### 4. Hooks
 
 파일 수정 시 자동 알림:
 
@@ -93,7 +115,7 @@ CLAUDE.md             # Root/shared guidelines
 }
 ```
 
-### 4. Workflow Patterns
+### 5. Workflow Patterns
 
 **Plan Mode** - 복잡한 작업 전 계획 수립:
 1. Explore (read files, understand patterns)
@@ -110,11 +132,19 @@ I want to build [feature]. Interview me using AskUserQuestion.
 - Session A: Writer
 - Session B: Reviewer
 
+**Git Worktree** - 여러 브랜치 동시 작업:
+```bash
+git worktree add ../project-wt -b _worktree-temp
+cd ../project-wt
+git checkout -b feature/actual-work  # 이 브랜치만 push
+```
+
 ## Customization
 
 1. `settings.local.json.example`을 `settings.local.json`으로 복사
 2. 프로젝트 경로에 맞게 hook 경로 수정
 3. 필요 없는 subagent 삭제
+4. `[business info]`, `[custom]` 태그 부분을 팀에 맞게 수정
 
 ## License
 
