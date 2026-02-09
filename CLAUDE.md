@@ -2,6 +2,55 @@
 
 공통 가이드라인. 하위 프로젝트에서 상속.
 
+## 코딩 원칙
+
+**1. Think Before Coding**
+- 가정을 명시적으로 밝히고, 불확실하면 질문
+- 여러 해석이 가능하면 제시 (임의로 선택 금지)
+
+**2. Simplicity First**
+- 요청한 것만 구현, 추측성 기능/추상화 금지
+- 200줄이 50줄로 가능하면 다시 작성
+
+**3. Surgical Changes**
+- 요청과 직접 관련된 코드만 수정
+- 인접 코드 "개선", 포매팅 변경 금지
+- 기존 스타일 유지 (다르게 하고 싶어도)
+
+**4. Goal-Driven Execution**
+- 작업을 검증 가능한 목표로 변환
+- "버그 수정" → "재현 테스트 작성 → 통과시키기"
+
+---
+
+## 필수 규칙
+
+- **커밋 금지 파일**: `~/.claude/`, `CLAUDE.local.md`, Personal Skills
+- **Assignee**: `[your-github-id]`
+- **[custom]**: 이슈/PR 생성 시 팀별 규칙 추가
+
+---
+
+## Database 환경 [business info]
+
+| 환경 | Host | 용도 |
+|------|------|------|
+| **Production** | `[prod-host]` | 운영 (주의!) |
+| **Staging** | `[staging-host]` | 개발/테스트 (기본) |
+
+**기본 규칙**: 특별한 언급 없으면 Staging DB 사용. 데이터 수정 전 반드시 Host 확인.
+
+---
+
+## 프로젝트별 정보 [business info]
+
+| 프로젝트 | 라벨 | 테스트 | 특이사항 |
+|----------|------|--------|----------|
+| project-a | `area:frontend` | `./scripts/test_local.sh` | Next.js |
+| project-b | `area:backend` | `./scripts/test_local.sh` | NestJS |
+
+---
+
 ## Workflow Patterns
 
 ### Plan Mode (복잡한 작업)
@@ -63,6 +112,24 @@ Session A: "Address this feedback: [Session B output]"
 Session A: "Write tests for user authentication"
 Session B: "Write code to pass these tests"
 ```
+
+### Git Worktree 병렬 작업
+
+여러 브랜치에서 동시 작업할 때:
+
+```bash
+# 세팅
+git worktree add ../project-wt -b _worktree-temp
+
+# 작업 (worktree 진입 후 반드시 feature 브랜치 생성)
+cd ../project-wt
+git checkout -b feature/actual-work  # 이 브랜치만 push
+
+# 정리
+git worktree remove ../project-wt
+```
+
+**주의**: `_worktree-*` 브랜치는 진입용일 뿐, 절대 push 금지
 
 ---
 
@@ -150,3 +217,10 @@ claude --resume      # 세션 선택
 1. 현재 데이터 상태 조회
 2. 영향 범위 파악
 3. 백업 필요 여부
+
+---
+
+## 도메인별 가이드 (Skills) [custom]
+
+- `[skill-name]` - [description]
+- `[skill-name]` - [description]
