@@ -18,15 +18,15 @@ chmod +x /your/project/.claude/hooks/*.sh
 ```
 .claude/
 ├── agents/           # Subagents
-│   ├── code-reviewer.md
+│   ├── code-reviewer.md      # Kent Beck Simple Design 기반 리뷰어
 │   ├── test-writer.md
 │   ├── nestjs-reviewer.md
 │   ├── frontend-reviewer.md
 │   └── dag-reviewer.md
-├── hooks/            # PostToolUse hooks
-│   ├── backend-edit-notify.sh
-│   ├── frontend-edit-notify.sh
-│   └── python-edit-notify.sh
+├── hooks/            # Pre/Post hooks
+│   ├── dangerous-command-check.sh  # PreToolUse: 위험 명령어 차단
+│   ├── auto-lint.sh               # PostToolUse: 자동 eslint --fix
+│   └── macos-notification.sh      # Notification: 작업 완료 알림
 └── settings.local.json.example
 
 templates/            # Project-specific CLAUDE.md templates
@@ -54,22 +54,17 @@ CLAUDE.md             # Root/shared guidelines
 ```markdown
 # Project Name
 
-간단한 설명.
-
 ## 코딩 원칙
 Think Before Coding, Simplicity First, Surgical Changes, Goal-Driven
 
 ## 필수 규칙
-커밋 금지 파일, Assignee 등
+커밋 금지 파일, Co-Authored-By 금지, Assignee 등
 
 ## Database 환경 [business info]
 Production/Staging 호스트
 
-## 프로젝트별 정보 [business info]
-프로젝트 테이블
-
-## Commands
-빌드/테스트 명령어
+## 코드 작성 후 자동 리뷰
+code-reviewer 서브에이전트 자동 실행
 
 ## 도메인별 Skills [custom]
 팀별 스킬 목록
@@ -93,29 +88,43 @@ CLAUDE.md에 포함된 핵심 원칙:
 "use subagent test-writer to write tests for this function"
 ```
 
+**code-reviewer**는 Kent Beck Simple Design 원칙 기반으로 over-engineering을 잡아냄.
+
 ### 4. Hooks
 
-파일 수정 시 자동 알림:
+3가지 hook 타입 지원:
+
+| Hook | 타입 | 역할 |
+|------|------|------|
+| `dangerous-command-check.sh` | PreToolUse (Bash) | `rm -rf /`, `DROP TABLE`, force push 등 차단 |
+| `auto-lint.sh` | PostToolUse (Edit/Write) | ts/js/tsx/jsx 파일 저장 시 eslint --fix 자동 실행 |
+| `macos-notification.sh` | Notification | 작업 완료 시 macOS 알림 |
 
 ```json
 {
   "hooks": {
+    "PreToolUse": [
+      { "matcher": "Bash", "hooks": [{ "type": "command", "command": "dangerous-command-check.sh" }] }
+    ],
     "PostToolUse": [
-      {
-        "matcher": "Edit|Write",
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/path/to/hook.sh"
-          }
-        ]
-      }
+      { "matcher": "Edit|Write", "hooks": [{ "type": "command", "command": "auto-lint.sh" }] }
+    ],
+    "Notification": [
+      { "hooks": [{ "type": "command", "command": "macos-notification.sh" }] }
     ]
   }
 }
 ```
 
-### 5. Workflow Patterns
+### 5. 자동 코드 리뷰
+
+코드 변경 작업 완료 시 `code-reviewer` 서브에이전트가 자동 실행:
+- Kent Beck Simple Design 4원칙 기반
+- Over-engineering 패턴 감지
+- Code Smells + 유지보수성 체크
+- 코드 수정 없이 피드백만 제공
+
+### 6. Workflow Patterns
 
 **Plan Mode** - 복잡한 작업 전 계획 수립:
 1. Explore (read files, understand patterns)
@@ -143,8 +152,9 @@ git checkout -b feature/actual-work  # 이 브랜치만 push
 
 1. `settings.local.json.example`을 `settings.local.json`으로 복사
 2. 프로젝트 경로에 맞게 hook 경로 수정
-3. 필요 없는 subagent 삭제
-4. `[business info]`, `[custom]` 태그 부분을 팀에 맞게 수정
+3. `dangerous-command-check.sh`에 Production DB 패턴 추가
+4. 필요 없는 subagent 삭제
+5. `[business info]`, `[custom]` 태그 부분을 팀에 맞게 수정
 
 ## License
 

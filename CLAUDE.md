@@ -26,7 +26,10 @@
 ## 필수 규칙
 
 - **커밋 금지 파일**: `~/.claude/`, `CLAUDE.local.md`, Personal Skills
+- **Co-Authored-By 금지**: 커밋 메시지에 포함하지 않음
+- **Claude Code 시그니처 금지**: PR 본문에 포함하지 않음
 - **Assignee**: `[your-github-id]`
+- **이슈 생성 시 라벨**: 이슈 만들기 전에 반드시 사용자에게 라벨 선택 확인
 - **[custom]**: 이슈/PR 생성 시 팀별 규칙 추가
 
 ---
@@ -217,6 +220,15 @@ claude --resume      # 세션 선택
 1. 현재 데이터 상태 조회
 2. 영향 범위 파악
 3. 백업 필요 여부
+
+---
+
+## 코드 작성 후 자동 리뷰
+
+코드 변경 작업 완료 시 `code-reviewer` 서브에이전트로 자동 리뷰 실행:
+- 대상: 새 기능 구현, 버그 수정, 리팩토링 등 코드 변경 작업
+- 제외: 단순 설정 변경, 문서 수정, 한 줄 수정
+- 리뷰 관점: Kent Beck Simple Design, Over-engineering 방지
 
 ---
 

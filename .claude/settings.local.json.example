@@ -2,7 +2,6 @@
   "permissions": {
     "allow": [
       "Bash(ls:*)",
-      "Bash(cat:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -24,24 +23,41 @@
       "Bash(pnpm:*)",
       "Bash(python -m pytest:*)",
       "Bash(python3 -m pytest:*)"
+    ],
+    "deny": [
+      "Bash(psql*[your-prod-db-host]*)",
+      "Bash(mongosh*[your-prod-db-host]*)"
     ]
   },
   "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/path/to/your/project/.claude/hooks/dangerous-command-check.sh"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
         "hooks": [
           {
             "type": "command",
-            "command": "/path/to/your/project/.claude/hooks/backend-edit-notify.sh"
-          },
+            "command": "/path/to/your/project/.claude/hooks/auto-lint.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "hooks": [
           {
             "type": "command",
-            "command": "/path/to/your/project/.claude/hooks/frontend-edit-notify.sh"
-          },
-          {
-            "type": "command",
-            "command": "/path/to/your/project/.claude/hooks/python-edit-notify.sh"
+            "command": "/path/to/your/project/.claude/hooks/macos-notification.sh"
           }
         ]
       }
